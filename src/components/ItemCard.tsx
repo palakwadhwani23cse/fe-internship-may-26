@@ -7,18 +7,33 @@ const CATEGORY_COLORS: Record<string, string> = {
   Language:  'bg-orange-500/20 text-orange-300',
 }
 
-export function ItemCard({ item }: { item: Item }) {
+function highlight(text: string, query: string) {
+  if (!query.trim()) return text
+  const escaped = query.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const parts = text.split(new RegExp(`(${escaped})`, 'gi'))
+  return parts.map((part, i) =>
+    part.toLowerCase() === query.trim().toLowerCase() ? (
+      <mark key={i} className="bg-yellow-400/30 text-yellow-200 rounded px-0.5">
+        {part}
+      </mark>
+    ) : (
+      part
+    )
+  )
+}
+
+export function ItemCard({ item, query = '' }: { item: Item; query?: string }) {
   return (
     <div className="bg-gray-800 rounded-xl p-4 border border-gray-700 hover:border-gray-600 transition-colors">
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <h3 className="text-white font-semibold text-sm">{item.name}</h3>
+            <h3 className="text-white font-semibold text-sm">{highlight(item.name, query)}</h3>
             <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${CATEGORY_COLORS[item.category] ?? 'bg-gray-600/20 text-gray-300'}`}>
               {item.category}
             </span>
           </div>
-          <p className="text-gray-400 text-xs leading-relaxed line-clamp-2">{item.description}</p>
+          <p className="text-gray-400 text-xs leading-relaxed line-clamp-2">{highlight(item.description, query)}</p>
         </div>
         <div className="flex items-center gap-1 text-xs text-gray-400 flex-shrink-0">
           <svg className="h-3.5 w-3.5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
